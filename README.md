@@ -70,8 +70,30 @@ The verified manifest dict carries:
 | `hydrate_log_rev` | `int` | Monotonic server-state revision |
 | `signature` | `str` | `ed25519:<base64url>` over JCS-canonicalized payload |
 
+## Reference deployment
+
+[`coproduct.fly.dev`](https://coproduct.fly.dev) is a live instance running the A2A server this SDK talks to. Point `COPRODUCT_A2A_ENDPOINT=https://coproduct.fly.dev/a2a` to integration-test against it. The `/aha` page on that host is a browser-based tamper playground for the same manifest verification this SDK does in Python.
+
 ## See also
 
-- [Coproduct A2A reference implementation (Rust)](https://github.com/coproduct-private/olog/tree/main/crates/coproduct-a2a)
-- [`coproduct.provable-coordination.v1` spec](https://coproduct.one/ext/provable-coordination/v1)
-- [Pa.A2A.1 PRD](https://github.com/coproduct-private/olog/blob/main/docs/pa-a2a-1-prd.md)
+- [`coproduct-a2a`](https://github.com/coproduct-opensource/coproduct-a2a) — Rust A2A server (the reference this SDK verifies against)
+- [`coproduct-demo-a2a-langgraph`](https://github.com/coproduct-opensource/coproduct-demo-a2a-langgraph) — LangGraph state graph using this SDK end-to-end
+- [`coproduct-demo-ragkit`](https://github.com/coproduct-opensource/coproduct-demo-ragkit) · [`coproduct-demo-taskhub`](https://github.com/coproduct-opensource/coproduct-demo-taskhub) — 5-agent companion demos
+- [`coproduct.provable-coordination.v1` spec](https://coproduct.fly.dev/ext/provable-coordination/v1)
+
+## Releasing
+
+Releases are published to PyPI via GitHub Actions trusted-publisher OIDC — no API token stored in this repo. To cut a release:
+
+1. Bump `[project].version` in `pyproject.toml`.
+2. Commit + push to `main`.
+3. Tag with `v<version>` and push the tag: `git tag v0.2.0 && git push origin v0.2.0`.
+4. Create a GitHub Release from that tag (via the web UI or `gh release create v0.2.0 --generate-notes`).
+
+The `publish` workflow builds `dist/`, smoke-tests the wheel, and uploads to PyPI. See `.github/workflows/publish.yml`.
+
+First-time setup: PyPI trusted-publisher config must exist. See the `pypi` GitHub Actions environment for the configuration.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

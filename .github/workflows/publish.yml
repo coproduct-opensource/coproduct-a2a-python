@@ -1,0 +1,69 @@
+name: publish to PyPI
+
+on:
+  release:
+    types: [published]
+  # Manual trigger for testing builds before tagging.
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build:
+    name: build sdist + wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Build distributions
+        run: uv build
+
+      - name: Verify the wheel installs + SDK imports cleanly
+        run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install --quiet dist/*.whl
+          /tmp/smoke/bin/python -c "import coproduct_a2a; assert coproduct_a2a.__version__"
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: publish to PyPI (trusted publisher / OIDC)
+    needs: build
+    runs-on: ubuntu-latest
+    # Only publish on release; manual workflow_dispatch runs stop
+    # after `build` so the smoke test still runs.
+    if: github.event_name == 'release'
+    environment:
+      name: pypi
+      url: https://pypi.org/project/coproduct-a2a/
+    permissions:
+      # Required for PyPI trusted publishing via OIDC — no token
+      # stored in repo secrets.
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # packages-dir defaults to dist/; explicit for clarity.
+          packages-dir: dist/
+          # Fail loudly on duplicate uploads instead of silently
+          # continuing — someone bumped the version but didn't edit
+          # pyproject.toml, most likely.
+          skip-existing: false
+          verbose: true
