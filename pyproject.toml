@@ -1,0 +1,41 @@
+[project]
+name = "coproduct-a2a"
+version = "0.1.0"
+description = "Python SDK for Coproduct A2A — provable-coordination extension client with bearer-token minting, manifest signature verification, and framework adapters (LangGraph, CrewAI)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Coproduct", email = "hello@coproduct.one" }]
+keywords = ["a2a", "agent2agent", "aaif", "ed25519", "jcs", "provable-coordination", "multi-agent"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Security :: Cryptography",
+]
+dependencies = [
+  "cryptography>=42",
+  "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://coproduct.fly.dev"
+Documentation = "https://coproduct.fly.dev/onboarding/token-mint"
+Repository = "https://github.com/coproduct-opensource/coproduct-a2a-python"
+"Extension spec" = "https://coproduct.fly.dev/ext/provable-coordination/v1"
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/coproduct_a2a"]
